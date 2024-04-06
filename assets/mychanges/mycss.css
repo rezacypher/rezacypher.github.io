@@ -1,0 +1,60 @@
+.progress {
+    position: relative;
+    width: 85%;
+    height: 60px;
+    background-image: url("repeat/humlinered.gif");
+    background-size: contain;
+    background-repeat: repeat-x;
+    border-radius: 5px;
+    overflow: hidden;
+    margin: auto;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.progress__fill {
+    width: 0%;
+    height: 100%;
+    background-image: url("repeat/colorfulltrans.gif");
+    background-size: 100px;
+    background-repeat: repeat-x;
+    transition: all 0.2s;
+}
+
+.progress__text {
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+    font: bold 14px "Quicksand", sans-serif;
+    color: #ffffff;
+}
+
+.skillsbtn {
+    background-color: transparent;
+    font: 18px "Quicksand", sans-serif;
+    color: white;
+    border: solid 2px;
+    padding: 15px 40px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-color: white;
+    border-radius: 5%;
+}
+.skillsbtn:hover {
+    background-color: #ffffff51;
+    font: bold 18px "Quicksand", sans-serif;
+    color: white;
+    border: solid 2px;
+    padding: 15px 40px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-color: white;
+    border-radius: 5%;
+}
+.sizecontroll{
+    Overflow-y: scroll;
+    max-height: 450px
+}
