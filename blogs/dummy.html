@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Dummy Blog – RezaCypher</title>
+  <link rel="stylesheet" href="../style.main.css">
+  <link rel="stylesheet" href="../style.blog_page.css">
+</head>
+<body data-theme="dark">
+  <canvas id="hexCanvas"></canvas>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="sidebar" id="sidebar">
+    <div style="text-align: center; margin-bottom: 20px;">
+      <h3 style="color: var(--accent-primary); text-transform: uppercase; letter-spacing: 2px;">Menu</h3>
+    </div>
+    <div class="sidebar-grid">
+      <a href="../cv.html" class="sidebar-item"><span class="sidebar-icon">📄</span><span class="sidebar-label">CV</span></a>
+      <a href="../projects.html" class="sidebar-item"><span class="sidebar-icon">📁</span><span class="sidebar-label">Projects</span></a>
+      <a href="../blogs.html" class="sidebar-item active"><span class="sidebar-icon">📝</span><span class="sidebar-label">Blogs</span></a>
+      <a href="../social.html" class="sidebar-item"><span class="sidebar-icon">💬</span><span class="sidebar-label">Social</span></a>
+    </div>
+  </div>
+
+  <div class="content">
+    <header class="portfolio-header" id="mainHeader">
+      <div class="header-logo-area">
+        <div class="header-logo" id="headerLogo">
+          <div class="logo-placeholder">
+            <span class="logo-placeholder-icon">👤</span>
+            <span class="logo-placeholder-text">Pic</span>
+          </div>
+        </div>
+        <div class="header-text">
+          <span class="header-title">RezaCypher</span>
+          <span class="header-subtitle" id="currentPage">BLOG</span>
+        </div>
+      </div>
+      <div class="header-controls">
+        <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+        <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar">☰</button>
+      </div>
+    </header>
+
+    <main class="cv-main" id="cvContent">
+      <div class="blog-post-container">
+        <article class="blog-post">
+          <!-- Title -->
+          <h1>Dummy Blog Post: All Standard Elements</h1>
+          <div class="meta">
+            <span>📅 2024/6/1</span>
+            <span>✍️ MohammadReza MajidPour</span>
+          </div>
+
+          <!-- Introduction paragraph -->
+          <p>
+            This is a dummy blog post that includes every standard article component you might need. Use it as a template for your own posts. From headings and paragraphs to code blocks and tables – everything is styled and ready to go.
+          </p>
+
+          <!-- H2 heading -->
+          <h2>Why This Template Matters</h2>
+          <p>
+            Having a consistent design across all your blog posts is essential. This CSS file ensures that no matter what content you throw at it, it will always look beautiful in both dark and light themes.
+          </p>
+
+          <!-- Image with caption -->
+          <img src="../img/blogs/placeholder.png" alt="Placeholder image" onerror="this.style.display='none'">
+          <div class="image-caption">A placeholder image (it's okay if it's missing – it won't break the layout).</div>
+
+          <!-- H3 heading -->
+          <h3>Blockquotes & Inline Code</h3>
+          <blockquote>
+            "Good code is its own best documentation." – Steve McConnell
+          </blockquote>
+          <p>
+            You can also highlight inline commands like <code>npm install</code> or <code>git push</code> using the <code>&lt;code&gt;</code> tag.
+          </p>
+
+          <!-- Code block -->
+          <h3>Code Block Example</h3>
+          <pre><code>function greet(name) {
+  return `Hello, ${name}!`;
+}
+console.log(greet('World'));</code></pre>
+
+          <!-- Unordered list -->
+          <h3>Unordered List</h3>
+          <ul>
+            <li>First item</li>
+            <li>Second item with a longer description to show how text wraps in lists.</li>
+            <li>Third item</li>
+          </ul>
+
+          <!-- Ordered list -->
+          <h3>Ordered List</h3>
+          <ol>
+            <li>Step one: plan your article.</li>
+            <li>Step two: write the content.</li>
+            <li>Step three: proofread and publish.</li>
+          </ol>
+
+          <!-- Table -->
+          <h3>Table Example</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Language</th>
+                <th>Purpose</th>
+                <th>Experience</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>C#</td>
+                <td>Desktop & Backend</td>
+                <td>Advanced</td>
+              </tr>
+              <tr>
+                <td>Python</td>
+                <td>Scripting & AI</td>
+                <td>Advanced</td>
+              </tr>
+              <tr>
+                <td>JavaScript</td>
+                <td>Frontend</td>
+                <td>Intermediate</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Horizontal rule -->
+          <hr>
+
+          <!-- H4 heading -->
+          <h4>A Smaller Heading</h4>
+          <p>
+            Sometimes you need a smaller sub-heading to break up content further. That's what <code>&lt;h4&gt;</code> is for.
+          </p>
+
+          <!-- Progress bar example -->
+          <h3>Progress Bar</h3>
+          <p>Web Development Skill: 73%</p>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 73%;"></div>
+          </div>
+          <p>Project Completion: 45%</p>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 45%;"></div>
+          </div>
+
+          <!-- Alerts -->
+          <h3>Alerts / Callouts</h3>
+          <div class="alert alert-info">
+            <strong>ℹ️ Info:</strong> This is an informational message.
+          </div>
+          <div class="alert alert-success">
+            <strong>✅ Success:</strong> Your blog post has been published.
+          </div>
+          <div class="alert alert-warning">
+            <strong>⚠️ Warning:</strong> This feature is experimental.
+          </div>
+          <div class="alert alert-danger">
+            <strong>❌ Danger:</strong> This action cannot be undone.
+          </div>
+
+          <!-- Badges -->
+          <h3>Badges</h3>
+          <p>
+            <span class="badge badge-primary">C#</span>
+            <span class="badge badge-secondary">Intermediate</span>
+            <span class="badge badge-outline">New</span>
+          </p>
+
+          <!-- Highlight box -->
+          <h3>Highlight Box</h3>
+          <div class="highlight-box">
+            <p>This entire box is highlighted to draw your attention. Use it for important notes or summaries.</p>
+          </div>
+
+          <!-- Tooltip -->
+          <h3>Tooltip</h3>
+          <p>
+            Hover over <span class="tooltip" data-tip="This is a tooltip!">this text</span> to see a tooltip.
+          </p>
+
+          <!-- Comparison card -->
+          <h3>Comparison Card</h3>
+          <div class="comparison-card">
+            <div class="comparison-item">
+              <h4>👍 Pros</h4>
+              <ul>
+                <li>Lightweight</li>
+                <li>Fast</li>
+                <li>Open source</li>
+              </ul>
+            </div>
+            <div class="comparison-item">
+              <h4>👎 Cons</h4>
+              <ul>
+                <li>Limited features</li>
+                <li>Small community</li>
+                <li>No mobile app</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Definition list -->
+          <h3>Definition List</h3>
+          <dl>
+            <dt>HTML</dt>
+            <dd>The standard markup language for creating web pages.</dd>
+            <dt>CSS</dt>
+            <dd>A style sheet language used for describing the presentation of a document.</dd>
+            <dt>JavaScript</dt>
+            <dd>A programming language that enables interactive web pages.</dd>
+          </dl>
+
+          <!-- Keyboard shortcuts -->
+          <h3>Keyboard Shortcuts</h3>
+          <p>
+            Use <kbd>Ctrl</kbd> + <kbd>C</kbd> to copy and <kbd>Ctrl</kbd> + <kbd>V</kbd> to paste.
+          </p>
+
+          <!-- Steps / process -->
+          <h3>Step‑by‑Step Process</h3>
+          <ol class="steps">
+            <li>Define the problem you want to solve.</li>
+            <li>Research existing solutions and best practices.</li>
+            <li>Write a detailed plan or specification.</li>
+            <li>Implement the solution in code.</li>
+            <li>Test, review, and iterate until it's perfect.</li>
+          </ol>
+
+          <!-- Image gallery -->
+          <h3>Image Gallery</h3>
+          <div class="image-gallery">
+            <img src="../img/blogs/gallery1.png" alt="Gallery image 1" onerror="this.style.display='none'">
+            <img src="../img/blogs/gallery2.png" alt="Gallery image 2" onerror="this.style.display='none'">
+            <img src="../img/blogs/gallery3.png" alt="Gallery image 3" onerror="this.style.display='none'">
+          </div>
+          <div class="image-caption">A small gallery of related images (they'll hide if missing).</div>
+
+          <!-- File tree -->
+          <h3>Project File Tree</h3>
+          <div class="file-tree">
+            📁 my-project/<br>
+            &nbsp;&nbsp;├── 📁 src/<br>
+            &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── 📄 index.html<br>
+            &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── 📄 style.css<br>
+            &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── 📄 script.js<br>
+            &nbsp;&nbsp;├── 📁 img/<br>
+            &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── 📄 logo.png<br>
+            &nbsp;&nbsp;└── 📄 README.md
+          </div>
+
+          <!-- Collapsible details -->
+          <h3>Collapsible Section</h3>
+          <details>
+            <summary>Click to expand more information</summary>
+            <div class="details-content">
+              <p>This content is hidden by default and appears when the user clicks the summary. Use it for FAQs, additional notes, or anything you want to keep tidy.</p>
+            </div>
+          </details>
+
+          <!-- Did you know? -->
+          <h3>Did You Know?</h3>
+          <div class="did-you-know">
+            <div class="icon">💡</div>
+            <p><strong>Did you know?</strong> You can combine these components to create rich, engaging blog posts that keep your readers on the page longer.</p>
+          </div>
+
+          <!-- Tags -->
+          <div class="tags">
+            <span class="tag">#Dummy</span>
+            <span class="tag">#Template</span>
+            <span class="tag">#Blog</span>
+          </div>
+
+          <!-- Author bio -->
+          <div class="author-bio">
+            <img src="../img/blogs/author.jpg" alt="Author" onerror="this.style.display='none'">
+            <div class="author-info">
+              <div class="author-name">MohammadReza MajidPour</div>
+              <div class="author-desc">Code analyst & developer. I write about programming, game dev, and productivity.</div>
+            </div>
+          </div>
+
+          <!-- Comments section -->
+          <div class="comments-section">
+            <h2>Comments</h2>
+            <div class="comment">
+              <div class="comment-author">John Doe</div>
+              <div class="comment-text">Great template! Thanks for sharing.</div>
+            </div>
+            <div class="comment">
+              <div class="comment-author">Jane Smith</div>
+              <div class="comment-text">Can't wait to see more blog posts using this design.</div>
+            </div>
+          </div>
+
+          <!-- Back link -->
+          <a href="../blogs.html" class="back-link">← Back to Blogs</a>
+        </article>
+      </div>
+    </main>
+
+    <footer class="portfolio-footer" id="mainFooter">
+      <a href="../cv.html" class="footer-link">CV</a>
+      <a href="../projects.html" class="footer-link">Projects</a>
+      <a href="../blogs.html" class="footer-link active">Blogs</a>
+      <a href="../social.html" class="footer-link">Social Media</a>
+    </footer>
+  </div>
+
+  <script src="../script.main.js"></script>
+  <script>
+    document.getElementById('currentPage').textContent = 'BLOG';
+  </script>
+</body>
+</html>
