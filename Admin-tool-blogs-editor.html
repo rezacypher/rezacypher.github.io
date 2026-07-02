@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog Data Editor – RezaCypher</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0a0a0a; color: #ccc;
+      display: flex; flex-direction: column; align-items: center;
+      min-height: 100vh; padding: 20px;
+    }
+    .container { max-width: 900px; width: 100%; }
+    h1 { color: #c22; font-weight: 300; letter-spacing: 2px; margin: 20px 0; border-left: 4px solid #c22; padding-left: 15px; }
+    .note {
+      background: #1a1a1a; border: 1px solid #333; border-radius: 12px;
+      padding: 12px 20px; margin-bottom: 20px; font-size: 14px;
+    }
+    .note strong { color: #ff4040; }
+    .toolbar { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
+    button, .file-label {
+      background: #c22; color: #fff; border: none; padding: 10px 20px;
+      border-radius: 30px; font-size: 14px; cursor: pointer;
+      letter-spacing: 1px; transition: background 0.3s, box-shadow 0.3s;
+    }
+    button:hover, .file-label:hover { background: #ff4040; box-shadow: 0 0 15px rgba(200,0,0,0.6); }
+    .file-label { background: #333; display: inline-block; }
+    #fileInput { display: none; }
+    .blog-entry {
+      background: #1a1a1a; border: 1px solid #333;
+      border-radius: 12px; padding: 15px; margin-bottom: 15px;
+    }
+    .entry-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 10px;
+    }
+    .entry-header h3 { color: #c22; margin: 0; }
+    .delete-btn { background: #333; color: #f66; padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; }
+    .entry-body {
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .entry-body input, .entry-body textarea {
+      background: #0a0a0a; border: 1px solid #555; color: #fff;
+      padding: 8px; border-radius: 8px; font-size: 14px;
+      font-family: inherit;
+    }
+    .entry-body textarea { resize: vertical; min-height: 50px; }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .row input { flex: 1; }
+    .export-area { margin-top: 30px; }
+    pre {
+      background: #000; padding: 15px; border-radius: 10px;
+      overflow-x: auto; font-size: 13px; color: #ccc;
+      white-space: pre-wrap; border: 1px solid #333; max-height: 400px;
+    }
+    .status-msg { color: #ff4040; margin: 10px 0; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📝 Blog Data Editor</h1>
+    <div class="note">
+      <strong>📁 Image files:</strong> Place blog images in <code>img/blogs/</code>. Enter the file name (e.g. <code>myblog.png</code>) in the "Image" field.<br>
+      <strong>🔗 Link:</strong> URL to the blog post (e.g. <code>blogs/my-post.html</code>).
+    </div>
+    <div class="toolbar">
+      <label class="file-label" for="fileInput">📂 Load script.blogs_data.js</label>
+      <input type="file" id="fileInput" accept=".js">
+      <button id="addBlogBtn">➕ Add Blog</button>
+      <button id="exportBtn">💾 Export File</button>
+      <span class="status-msg" id="statusMsg"></span>
+    </div>
+
+    <div id="editorContainer">
+      <p style="color:#666;">Load a script.blogs_data.js file to start editing.</p>
+    </div>
+
+    <div class="export-area" id="exportArea" style="display:none;">
+      <h3 style="color:#aaa; margin-bottom:10px;">Generated script.blogs_data.js – Copy and replace your file</h3>
+      <pre id="exportCode"></pre>
+      <button id="copyExportBtn">📋 Copy to Clipboard</button>
+    </div>
+  </div>
+
+  <script>
+    // ----- STATE -----
+    let blogs = [];   // array of { title, image, hashtags, short, link }
+    const fileInput = document.getElementById('fileInput');
+    const editorContainer = document.getElementById('editorContainer');
+    const exportArea = document.getElementById('exportArea');
+    const exportCode = document.getElementById('exportCode');
+    const statusMsg = document.getElementById('statusMsg');
+
+    // ----- HELPERS -----
+    function escapeHtml(text) {
+      const map = { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' };
+      return String(text).replace(/[&<>"']/g, m => map[m]);
+    }
+
+    // ----- PARSE script.blogs_data.js -----
+    function parseBlogData(content) {
+      // Extract the array assigned to window.blogData
+      const match = content.match(/window\.blogData\s*=\s*(\[[\s\S]*?\]);/);
+      if (!match) {
+        throw new Error('Could not find window.blogData array in the file.');
+      }
+      try {
+        return eval('(' + match[1] + ')');
+      } catch (e) {
+        throw new Error('Failed to parse the array.');
+      }
+    }
+
+    // ----- RENDER EDITOR -----
+    function renderEditor() {
+      editorContainer.innerHTML = '';
+      if (blogs.length === 0) {
+        editorContainer.innerHTML = '<p style="color:#666;">No blogs found. Click "Add Blog" to create one.</p>';
+        return;
+      }
+      blogs.forEach((blog, index) => {
+        const entry = document.createElement('div');
+        entry.className = 'blog-entry';
+        entry.dataset.index = index;
+        entry.innerHTML = `
+          <div class="entry-header">
+            <h3>Blog #${index + 1}</h3>
+            <button class="delete-btn delete-blog-btn">🗑️ Delete</button>
+          </div>
+          <div class="entry-body">
+            <div class="row">
+              <input type="text" class="title-input" value="${escapeHtml(blog.title)}" placeholder="Blog Title">
+            </div>
+            <div class="row">
+              <input type="text" class="image-input" value="${escapeHtml(blog.image || '')}" placeholder="Image file name or emoji (optional)">
+              <input type="text" class="link-input" value="${escapeHtml(blog.link || '')}" placeholder="Link URL (optional)">
+            </div>
+            <div class="row">
+              <input type="text" class="hashtags-input" value="${escapeHtml((blog.hashtags || []).join(', '))}" placeholder="Hashtags (comma separated)">
+            </div>
+            <textarea class="short-input" placeholder="Short description">${escapeHtml(blog.short || '')}</textarea>
+          </div>`;
+        editorContainer.appendChild(entry);
+      });
+      attachEvents();
+    }
+
+    // ----- COLLECT FORM DATA -----
+    function collectFormData() {
+      const entries = document.querySelectorAll('.blog-entry');
+      blogs = Array.from(entries).map(entry => {
+        const titleInput = entry.querySelector('.title-input');
+        const imageInput = entry.querySelector('.image-input');
+        const linkInput = entry.querySelector('.link-input');
+        const hashtagsInput = entry.querySelector('.hashtags-input');
+        const shortInput = entry.querySelector('.short-input');
+        return {
+          title: titleInput ? titleInput.value.trim() : '',
+          image: imageInput ? imageInput.value.trim() : '',
+          link: linkInput ? linkInput.value.trim() : '',
+          hashtags: hashtagsInput ? hashtagsInput.value.split(',').map(t => t.trim()).filter(Boolean) : [],
+          short: shortInput ? shortInput.value.trim() : ''
+        };
+      });
+    }
+
+    // ----- EVENT HANDLING -----
+    function attachEvents() {
+      document.querySelectorAll('.delete-blog-btn').forEach(btn => {
+        btn.onclick = (e) => {
+          const entry = e.target.closest('.blog-entry');
+          const index = parseInt(entry.dataset.index);
+          if (confirm('Delete this blog entry?')) {
+            blogs.splice(index, 1);
+            renderEditor();
+          }
+        };
+      });
+      document.querySelectorAll('input, textarea').forEach(input => {
+        input.addEventListener('input', () => collectFormData());
+      });
+    }
+
+    // ----- EXPORT -----
+    function generateExport() {
+      collectFormData();
+      const json = JSON.stringify(blogs, null, 2);
+      const formatted = json.replace(/"(\w+)":/g, '$1:'); // remove quotes around keys (simple)
+      // Better to manually format for consistency, but the above works for simple cases.
+      const content = `// Blog data – add as many objects as you like.
+window.blogData = ${json};
+
+`;
+      return content;
+    }
+
+    function exportFile() {
+      const content = generateExport();
+      exportCode.textContent = content;
+      exportArea.style.display = 'block';
+    }
+
+    // ----- FILE LOADING -----
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          blogs = parseBlogData(ev.target.result);
+          statusMsg.textContent = `Loaded ${blogs.length} blog(s).`;
+          renderEditor();
+        } catch (err) {
+          statusMsg.textContent = 'Error: ' + err.message;
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById('addBlogBtn').addEventListener('click', () => {
+      blogs.push({
+        title: 'New Blog Post',
+        image: '',
+        hashtags: ['New'],
+        short: 'Short description here.',
+        link: 'blogs/new-post.html'
+      });
+      renderEditor();
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', exportFile);
+    document.getElementById('copyExportBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(exportCode.textContent).then(() => {
+        alert('Copied to clipboard!');
+      });
+    });
+  </script>
+</body>
+</html>

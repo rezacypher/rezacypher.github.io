@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog Post Editor – RezaCypher</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    /* ---------- CUSTOM SCROLLBAR ---------- */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: #1a1a1a; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; border: 2px solid #1a1a1a; }
+    ::-webkit-scrollbar-thumb:hover { background: #666; }
+    * { scrollbar-width: thin; scrollbar-color: #444 #1a1a1a; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0a0a0a; color: #ccc;
+      display: flex; flex-direction: column; height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ---------- TOP TOOLBAR ---------- */
+    .top-toolbar {
+      background: #1a1a1a; border-bottom: 1px solid #333;
+      padding: 10px 20px; display: flex; gap: 10px; align-items: center;
+      flex-wrap: wrap; z-index: 20;
+    }
+    .top-toolbar button, .file-label {
+      background: #c22; color: #fff; border: none;
+      padding: 8px 16px; border-radius: 20px; font-size: 13px;
+      cursor: pointer; white-space: nowrap;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .top-toolbar button:hover, .file-label:hover {
+      background: #ff4040; box-shadow: 0 0 10px rgba(200,0,0,0.6);
+    }
+    .top-toolbar button:disabled { opacity:0.5; cursor:not-allowed; background:#555; }
+    .file-label { background: #333; }
+    #fileInput { display: none; }
+    .toggle-btn {
+      background: #2a2a2a !important; color: #ccc !important;
+      border: 1px solid #444; padding: 6px 14px;
+    }
+    .toggle-btn.active { background: var(--accent-primary) !important; color: #fff !important; }
+    .color-picker { width: 32px; height: 32px; border: none; cursor: pointer; background: transparent; }
+    input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    input[type="color"]::-webkit-color-swatch { border: 1px solid #333; border-radius: 4px; }
+    .color-preview {
+      background: #111; border: 1px solid #444; border-radius: 6px;
+      padding: 4px 10px; font-family: 'Courier New', monospace;
+      font-size: 13px; max-width: 250px; overflow: hidden;
+      text-overflow: ellipsis; white-space: nowrap;
+      color: #ccc; line-height: 1.5;
+    }
+
+    /* ---------- MAIN LAYOUT ---------- */
+    .main-area { display: flex; flex: 1; overflow: hidden; }
+
+    /* ---------- SIDEBAR ---------- */
+    .sidebar {
+      width: 380px; background: #1a1a1a; border-right: 1px solid #333;
+      display: flex; flex-direction: column; transition: width 0.3s;
+      overflow: hidden;
+    }
+    .sidebar.collapsed { width: 0; border-right: none; }
+    .sidebar-preview {
+      flex-shrink: 0; height: 220px; border-bottom: 1px solid #333;
+      overflow: hidden; position: relative;
+    }
+    .sidebar-preview iframe {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
+    }
+    .sidebar-elements { flex: 1; overflow-y: auto; padding: 15px; }
+    .sidebar h3 {
+      color: #c22; text-transform: uppercase; letter-spacing: 2px;
+      font-size: 14px; margin-bottom: 12px; padding-left: 10px;
+    }
+    .element-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .elem-btn {
+      background: #222; border: 1px solid #444; border-radius: 10px;
+      padding: 10px 6px; text-align: center; color: #ccc;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 4px; font-size: 12px;
+    }
+    .elem-btn:hover {
+      background: #333; border-color: var(--accent-primary);
+      box-shadow: 0 0 8px var(--accent-glow); transform: translateY(-2px);
+    }
+    .elem-btn .icon { font-size: 20px; }
+
+    /* ---------- PANELS ---------- */
+    .panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .panel-header {
+      background: #1a1a1a; padding: 8px 15px; border-bottom: 1px solid #333;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .panel-header span { font-size: 13px; letter-spacing: 1px; color: #888; }
+
+    /* ---------- CODE EDITOR (textarea + overlay) ---------- */
+    .editor-scroll-container {
+      flex: 1; overflow-y: auto; overflow-x: hidden; background: #111;
+    }
+    .code-container {
+      position: relative; width: 100%; min-height: 100%;
+    }
+    .code-background,
+    .code-textarea {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      margin: 0; padding: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px; line-height: 1.6;
+      white-space: pre-wrap; word-wrap: break-word;
+      background: #111;
+      border: none; outline: none;
+      font-kerning: none; letter-spacing: normal; word-spacing: normal;
+      text-rendering: optimizeSpeed;
+    }
+    .code-background {
+      color: #f8f8f2; z-index: 1; pointer-events: none;
+    }
+    .code-background code { font-family: inherit; font-size: inherit; }
+    .code-textarea {
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      caret-color: #fff;
+      background: transparent;
+      z-index: 2;
+      resize: none;
+      overflow: hidden;
+    }
+    .code-textarea::selection {
+      background: rgba(200,30,30,0.3);
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+    }
+    .code-textarea:focus { outline: 1px solid var(--accent-primary); }
+
+    /* Syntax colours */
+    .code-background .hl-tag { color: #ff79c6; }
+    .code-background .hl-attr { color: #50fa7b; }
+    .code-background .hl-value { color: #f1fa8c; }
+    .code-background .hl-comment { color: #6272a4; font-style: italic; }
+
+    /* Preview */
+    iframe.preview-frame {
+      width: 100%; height: 100%; border: none; background: #0a0a0a;
+    }
+    .status-bar {
+      padding: 8px 20px; background: #1a1a1a; border-top: 1px solid #333;
+      font-size: 13px; color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-toolbar">
+    <label class="file-label" for="fileInput">📂 Load Blog HTML</label>
+    <input type="file" id="fileInput" accept=".html">
+    <button id="btnUndo">↩ Undo</button>
+    <button id="btnRedo">↪ Redo</button>
+    <button id="btnExport">💾 Export</button>
+    <input type="color" id="colorPicker" class="color-picker" value="#ffffff" title="Choose a color">
+    <span id="colorPreview" class="color-preview">No text selected</span>
+    <button id="btnApplyColor">🎨 Apply</button>
+    <button id="toggleSidebar" class="toggle-btn active">🗂️ Elements</button>
+    <button id="toggleCode" class="toggle-btn active">👁️ Code</button>
+    <button id="togglePreview" class="toggle-btn active">👁️ Preview</button>
+  </div>
+
+  <div class="main-area">
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-preview" id="sidebarPreview">
+        <iframe id="previewIframe" scrolling="no"></iframe>
+      </div>
+      <div class="sidebar-elements">
+        <h3>⚡ Elements</h3>
+        <div class="element-grid" id="elementGrid"></div>
+      </div>
+    </div>
+
+    <div class="panel" id="codePanel">
+      <div class="panel-header"><span>HTML Source</span></div>
+      <div class="editor-scroll-container" id="editorScrollContainer">
+        <div class="code-container" id="codeContainer">
+          <pre class="code-background"><code id="highlightedCode"></code></pre>
+          <textarea id="codeEditor" class="code-textarea" placeholder="Blog article content..." spellcheck="false"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="previewPanel">
+      <div class="panel-header"><span>Live Preview</span></div>
+      <div style="flex:1; overflow:hidden;">
+        <iframe id="previewFrame" class="preview-frame"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-bar"><span id="statusMsg">Load a blog HTML file to begin editing.</span></div>
+
+  <script>
+    (function() {
+      const codeEditor = document.getElementById('codeEditor');
+      const codeContainer = document.getElementById('codeContainer');
+      const editorScrollContainer = document.getElementById('editorScrollContainer');
+      const highlightedCode = document.getElementById('highlightedCode');
+      const previewFrame = document.getElementById('previewFrame');
+      const previewIframe = document.getElementById('previewIframe');
+      const fileInput = document.getElementById('fileInput');
+      const exportBtn = document.getElementById('btnExport');
+      const btnUndo = document.getElementById('btnUndo');
+      const btnRedo = document.getElementById('btnRedo');
+      const toggleCodeBtn = document.getElementById('toggleCode');
+      const togglePreviewBtn = document.getElementById('togglePreview');
+      const toggleSidebarBtn = document.getElementById('toggleSidebar');
+      const codePanel = document.getElementById('codePanel');
+      const previewPanel = document.getElementById('previewPanel');
+      const sidebar = document.getElementById('sidebar');
+      const elementGrid = document.getElementById('elementGrid');
+      const colorPicker = document.getElementById('colorPicker');
+      const colorPreview = document.getElementById('colorPreview');
+      const btnApplyColor = document.getElementById('btnApplyColor');
+      const statusMsg = document.getElementById('statusMsg');
+
+      let originalFullHTML = '';
+
+      // ========== FULL CSS FOR PREVIEWS ==========
+      const previewStyles = `<style>
+        :root {
+          --bg-primary: #0a0a0a; --text-primary: #ffffff; --text-secondary: #cccccc;
+          --accent-primary: #c22; --accent-glow: #ff4040; --border-color: rgba(200,0,0,0.3);
+          --header-bg: rgba(0,0,0,0.7);
+        }
+        [data-theme="light"] {
+          --bg-primary: #f5f5f5; --text-primary: #1a1a1a; --text-secondary: #333333;
+          --accent-primary: #d4a017; --accent-glow: #ffd700; --border-color: rgba(212,160,23,0.3);
+          --header-bg: rgba(255,255,255,0.85);
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-primary); color: var(--text-primary); margin:0; }
+        .blog-post-container { max-width:800px; margin:0 auto; padding:20px; }
+        .blog-post { background:var(--header-bg); backdrop-filter:blur(12px); border:1px solid var(--border-color); border-radius:24px; padding:30px; line-height:1.7; }
+        ${getFullBlogCSS()}
+      </style>`;
+
+      function getFullBlogCSS() {
+        return `
+          .blog-post h1 { font-size:2.2rem; font-weight:300; color:var(--accent-primary); border-left:4px solid var(--accent-primary); padding-left:20px; margin-bottom:20px; text-shadow:0 0 8px var(--accent-glow); }
+          .blog-post h2 { font-size:1.7rem; font-weight:400; color:var(--text-primary); margin:40px 0 20px; border-left:3px solid var(--accent-primary); padding-left:15px; }
+          .blog-post h3 { font-size:1.4rem; font-weight:500; color:var(--text-primary); margin:30px 0 15px; }
+          .blog-post h4 { font-size:1.2rem; font-weight:600; color:var(--text-secondary); margin:25px 0 10px; }
+          .blog-post .meta { color:var(--text-secondary); font-size:0.9rem; margin-bottom:30px; display:flex; gap:15px; flex-wrap:wrap; }
+          .blog-post p { margin-bottom:20px; color:var(--text-secondary); }
+          .blog-post img { max-width:100%; height:auto; border-radius:12px; margin:20px 0; border:1px solid var(--border-color); display:block; }
+          .blog-post .image-caption { text-align:center; font-size:0.85rem; color:var(--text-secondary); margin-top:-10px; margin-bottom:20px; opacity:0.8; }
+          .blog-post blockquote { border-left:3px solid var(--accent-primary); padding-left:20px; margin:25px 0; font-style:italic; color:var(--text-secondary); background:rgba(128,128,128,0.05); border-radius:0 8px 8px 0; }
+          .blog-post pre { background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:12px; padding:20px; overflow-x:auto; font-size:0.9rem; line-height:1.6; color:var(--text-primary); margin:20px 0; }
+          [data-theme="light"] .blog-post pre { background:rgba(0,0,0,0.05); }
+          .blog-post code { background:rgba(200,30,30,0.1); color:var(--accent-primary); padding:2px 6px; border-radius:4px; font-size:0.9em; }
+          [data-theme="light"] .blog-post code { background:rgba(212,160,23,0.1); }
+          .blog-post ul, .blog-post ol { margin:20px 0 20px 30px; color:var(--text-secondary); }
+          .blog-post li { margin-bottom:10px; }
+          .blog-post table { width:100%; border-collapse:collapse; margin:25px 0; }
+          .blog-post th, .blog-post td { padding:12px; text-align:left; border-bottom:1px solid var(--border-color); }
+          .blog-post th { color:var(--accent-primary); font-weight:600; }
+          .blog-post td { color:var(--text-secondary); }
+          .blog-post hr { border:none; border-top:1px solid var(--border-color); margin:30px 0; }
+          .blog-post .tags { margin-top:30px; display:flex; gap:10px; flex-wrap:wrap; }
+          .blog-post .tag { background:rgba(200,30,30,0.15); color:var(--accent-primary); padding:4px 14px; border-radius:20px; border:1px solid var(--accent-primary); font-size:0.8rem; }
+          [data-theme="light"] .blog-post .tag { background:rgba(212,160,23,0.15); }
+          .progress-bar { background:rgba(128,128,128,0.2); border-radius:20px; height:12px; margin:15px 0 25px; overflow:hidden; }
+          .progress-fill { height:100%; background:var(--accent-primary); border-radius:20px; box-shadow:0 0 8px var(--accent-glow); }
+          .alert { padding:20px; border-radius:12px; margin:25px 0; border:1px solid transparent; }
+          .alert-info { background:rgba(33,150,243,0.1); border-color:rgba(33,150,243,0.3); color:#64b5f6; }
+          [data-theme="light"] .alert-info { background:rgba(33,150,243,0.05); color:#1565c0; }
+          .alert-success { background:rgba(76,175,80,0.1); border-color:rgba(76,175,80,0.3); color:#81c784; }
+          [data-theme="light"] .alert-success { background:rgba(76,175,80,0.05); color:#2e7d32; }
+          .alert-warning { background:rgba(255,152,0,0.1); border-color:rgba(255,152,0,0.3); color:#ffb74d; }
+          [data-theme="light"] .alert-warning { background:rgba(255,152,0,0.05); color:#e65100; }
+          .alert-danger { background:rgba(244,67,54,0.1); border-color:rgba(244,67,54,0.3); color:#e57373; }
+          [data-theme="light"] .alert-danger { background:rgba(244,67,54,0.05); color:#c62828; }
+          .badge { display:inline-block; padding:4px 12px; border-radius:20px; font-size:0.8rem; font-weight:600; letter-spacing:0.5px; border:1px solid; }
+          .badge-primary { background:rgba(200,30,30,0.15); color:var(--accent-primary); border-color:var(--accent-primary); }
+          [data-theme="light"] .badge-primary { background:rgba(212,160,23,0.15); }
+          .badge-secondary { background:rgba(128,128,128,0.15); color:#888; border-color:#888; }
+          .badge-outline { background:transparent; color:var(--accent-primary); border-color:var(--accent-primary); }
+          .highlight-box { background:rgba(200,30,30,0.05); border-left:4px solid var(--accent-primary); padding:20px; border-radius:0 8px 8px 0; margin:25px 0; }
+          [data-theme="light"] .highlight-box { background:rgba(212,160,23,0.05); }
+          .tooltip { position:relative; cursor:help; border-bottom:1px dotted var(--accent-primary); }
+          .tooltip::after { content:attr(data-tip); position:absolute; bottom:120%; left:50%; transform:translateX(-50%); background:var(--text-primary); color:var(--bg-primary); padding:6px 12px; border-radius:8px; font-size:0.8rem; white-space:nowrap; opacity:0; pointer-events:none; transition:opacity 0.2s; }
+          .tooltip:hover::after { opacity:1; }
+          .comparison-card { display:flex; gap:20px; margin:25px 0; }
+          .comparison-item { flex:1; padding:20px; border:1px solid var(--border-color); border-radius:12px; background:rgba(128,128,128,0.05); }
+          .comparison-item h4 { margin-bottom:10px; color:var(--accent-primary); }
+          .blog-post dl { margin:20px 0; }
+          .blog-post dt { font-weight:600; color:var(--accent-primary); margin-top:15px; }
+          .blog-post dd { margin-left:20px; color:var(--text-secondary); margin-bottom:10px; }
+          kbd { background:rgba(128,128,128,0.2); border:1px solid var(--border-color); border-radius:4px; padding:2px 6px; font-size:0.85em; color:var(--text-primary); box-shadow:0 1px 2px rgba(0,0,0,0.2); }
+          .steps { list-style:none; counter-reset:step; margin:25px 0; padding:0; }
+          .steps li { counter-increment:step; position:relative; padding-left:50px; margin-bottom:25px; color:var(--text-secondary); }
+          .steps li::before { content:counter(step); position:absolute; left:0; top:0; width:36px; height:36px; border-radius:50%; background:var(--accent-primary); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:1rem; box-shadow:0 0 8px var(--accent-glow); }
+          .image-gallery { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:15px; margin:25px 0; }
+          .image-gallery img { width:100%; height:180px; object-fit:cover; border-radius:12px; border:1px solid var(--border-color); margin:0; }
+          .file-tree { background:rgba(0,0,0,0.1); border:1px solid var(--border-color); border-radius:12px; padding:20px; font-family:monospace; font-size:0.9rem; line-height:1.8; color:var(--text-secondary); margin:20px 0; }
+          [data-theme="light"] .file-tree { background:rgba(0,0,0,0.03); }
+          details { margin:20px 0; border:1px solid var(--border-color); border-radius:12px; overflow:hidden; }
+          summary { padding:15px 20px; cursor:pointer; font-weight:600; color:var(--accent-primary); background:rgba(128,128,128,0.05); list-style:none; display:flex; align-items:center; gap:8px; }
+          summary::before { content:"▶"; display:inline-block; transition:transform 0.2s; font-size:0.7rem; }
+          details[open] summary::before { transform:rotate(90deg); }
+          details .details-content { padding:20px; color:var(--text-secondary); }
+          .did-you-know { background:rgba(200,30,30,0.05); border:1px solid var(--accent-primary); border-radius:12px; padding:20px; margin:25px 0; display:flex; gap:15px; align-items:flex-start; }
+          [data-theme="light"] .did-you-know { background:rgba(212,160,23,0.05); }
+          .did-you-know .icon { font-size:1.8rem; line-height:1; }
+          .author-bio { display:flex; gap:20px; align-items:center; margin-top:40px; padding:20px; border:1px solid var(--border-color); border-radius:12px; background:rgba(128,128,128,0.05); }
+          .author-bio img { width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid var(--accent-primary); }
+          .author-bio .author-info { flex:1; }
+          .author-bio .author-name { font-weight:600; color:var(--text-primary); }
+          .author-bio .author-desc { font-size:0.9rem; color:var(--text-secondary); }
+          .comments-section { margin-top:40px; }
+          .comments-section h2 { font-size:1.5rem; margin-bottom:20px; }
+          .comment { padding:15px; border:1px solid var(--border-color); border-radius:12px; margin-bottom:15px; background:rgba(128,128,128,0.03); }
+          .comment .comment-author { font-weight:600; color:var(--accent-primary); margin-bottom:5px; }
+          .comment .comment-text { color:var(--text-secondary); font-size:0.9rem; }
+          .back-link { display:inline-block; margin-top:30px; color:var(--accent-primary); text-decoration:none; border:1px solid var(--accent-primary); padding:10px 20px; border-radius:30px; transition:all 0.3s; }
+          .back-link:hover { background:var(--accent-primary); color:#fff; box-shadow:0 0 15px var(--accent-primary); }
+        `;
+      }
+
+      // ========== UNDO / REDO STACK ==========
+      const MAX_STACK = 100;
+      let undoStack = [], redoStack = [];
+      function pushState() {
+        undoStack.push(codeEditor.value);
+        if (undoStack.length > MAX_STACK) undoStack.shift();
+        redoStack = [];
+        updateButtons();
+      }
+      function undo() {
+        if (undoStack.length === 0) return;
+        redoStack.push(codeEditor.value);
+        codeEditor.value = undoStack.pop();
+        syncAll();
+        updateButtons();
+      }
+      function redo() {
+        if (redoStack.length === 0) return;
+        undoStack.push(codeEditor.value);
+        codeEditor.value = redoStack.pop();
+        syncAll();
+        updateButtons();
+      }
+      function updateButtons() {
+        btnUndo.disabled = undoStack.length === 0;
+        btnRedo.disabled = redoStack.length === 0;
+      }
+
+      codeEditor.addEventListener('beforeinput', () => pushState());
+
+      // ========== INSERT AT CURSOR ==========
+      function insertAtCursor(html) {
+        pushState();
+        const start = codeEditor.selectionStart;
+        const end = codeEditor.selectionEnd;
+        const before = codeEditor.value.substring(0, start);
+        const after = codeEditor.value.substring(end);
+        codeEditor.value = before + html + after;
+        const newPos = start + html.length;
+        codeEditor.selectionStart = newPos;
+        codeEditor.selectionEnd = newPos;
+        codeEditor.focus();
+        syncAll();
+      }
+
+      // ========== COLOR PICKER (preview + apply) ==========
+      let currentColor = colorPicker.value;
+      let savedSelection = null;
+
+      colorPicker.addEventListener('input', e => { currentColor = e.target.value; updateColorPreview(); });
+
+      codeEditor.addEventListener('select', () => {
+        const start = codeEditor.selectionStart, end = codeEditor.selectionEnd;
+        if (start !== end) savedSelection = { start, end, text: codeEditor.value.substring(start, end) };
+        else savedSelection = null;
+        updateColorPreview();
+      });
+      document.addEventListener('selectionchange', () => {
+        if (document.activeElement === codeEditor) {
+          const s = codeEditor.selectionStart, e = codeEditor.selectionEnd;
+          if (s !== e) savedSelection = { start:s, end:e, text:codeEditor.value.substring(s, e) };
+          else savedSelection = null;
+          updateColorPreview();
+        }
+      });
+
+      function updateColorPreview() {
+        if (savedSelection && savedSelection.text) {
+          const t = savedSelection.text.length > 30 ? savedSelection.text.substring(0,30)+'…' : savedSelection.text;
+          colorPreview.textContent = t; colorPreview.style.color = currentColor;
+          btnApplyColor.disabled = false;
+        } else {
+          colorPreview.textContent = 'No text selected'; colorPreview.style.color = '#ccc';
+          btnApplyColor.disabled = true;
+        }
+      }
+
+      btnApplyColor.addEventListener('click', () => {
+        if (!savedSelection) return;
+        pushState();
+        const { start, end } = savedSelection;
+        const selected = codeEditor.value.substring(start, end);
+        const wrapped = `<span style="color: ${currentColor};">${selected}</span>`;
+        const before = codeEditor.value.substring(0, start);
+        const after = codeEditor.value.substring(end);
+        codeEditor.value = before + wrapped + after;
+        codeEditor.selectionStart = start + wrapped.length;
+        codeEditor.selectionEnd = start + wrapped.length;
+        codeEditor.focus();
+        savedSelection = null;
+        updateColorPreview();
+        syncAll();
+      });
+
+      // ========== SYNTAX HIGHLIGHTING ==========
+      function updateHighlight() {
+        const text = codeEditor.value;
+        let escaped = text
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+        escaped = escaped.replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="hl-comment">$1</span>');
+        escaped = escaped.replace(/(&lt;)(\/?[\w-]+)([\s\S]*?)(\/?&gt;)/g,
+          function(match, open, tag, rest, close) {
+            let colouredRest = rest.replace(
+              /([\w-]+)(=)(&quot;.*?&quot;|'.*?'|\S+)/g,
+              '<span class="hl-attr">$1</span>$2<span class="hl-value">$3</span>'
+            );
+            return `<span class="hl-tag">${open}${tag}</span>${colouredRest}<span class="hl-tag">${close}</span>`;
+          });
+        highlightedCode.innerHTML = escaped;
+
+        // Keep the textarea height in sync with its content
+        codeEditor.style.height = 'auto';
+        codeEditor.style.height = codeEditor.scrollHeight + 'px';
+        codeContainer.style.height = codeEditor.scrollHeight + 'px';
+      }
+
+      // ========== PREVIEW ==========
+      function updatePreview() {
+        const content = codeEditor.value;
+        const html = `<html><head>${previewStyles}</head><body data-theme="dark"><div class="blog-post-container"><article class="blog-post">${content}</article></div></body></html>`;
+        const doc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+        doc.open(); doc.write(html); doc.close();
+      }
+
+      function syncAll() {
+        updateHighlight();
+        updatePreview();
+      }
+
+      codeEditor.addEventListener('input', syncAll);
+
+      // ========== UNDO / REDO BUTTONS ==========
+      btnUndo.addEventListener('click', undo);
+      btnRedo.addEventListener('click', redo);
+      codeEditor.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+          e.preventDefault();
+          e.shiftKey ? redo() : undo();
+        }
+      });
+
+      // ========== LOAD & EXPORT ==========
+      fileInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          originalFullHTML = ev.target.result;
+          const doc = new DOMParser().parseFromString(originalFullHTML, 'text/html');
+          const article = doc.querySelector('.blog-post');
+          if (article) {
+            codeEditor.value = article.innerHTML.trim();
+            undoStack = []; redoStack = [];
+            syncAll();
+            statusMsg.textContent = `Loaded "${file.name}".`;
+          } else {
+            statusMsg.textContent = 'Error: .blog-post not found.';
+          }
+        };
+        reader.readAsText(file);
+      });
+
+      exportBtn.addEventListener('click', () => {
+        if (!originalFullHTML) { alert('Load a blog HTML file first.'); return; }
+        const updated = codeEditor.value;
+        const doc = new DOMParser().parseFromString(originalFullHTML, 'text/html');
+        const article = doc.querySelector('.blog-post');
+        if (article) {
+          article.innerHTML = updated;
+          const newHTML = '<!DOCTYPE html>\n' + doc.documentElement.outerHTML;
+          const blob = new Blob([newHTML], { type: 'text/html' });
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = 'updated-blog.html'; a.click();
+          URL.revokeObjectURL(a.href);
+          statusMsg.textContent = 'Exported.';
+        }
+      });
+
+      // ========== PANEL TOGGLES ==========
+      toggleCodeBtn.addEventListener('click', () => {
+        const vis = codePanel.style.display !== 'none';
+        codePanel.style.display = vis ? 'none' : 'flex';
+        toggleCodeBtn.classList.toggle('active', !vis);
+      });
+      togglePreviewBtn.addEventListener('click', () => {
+        const vis = previewPanel.style.display !== 'none';
+        previewPanel.style.display = vis ? 'none' : 'flex';
+        togglePreviewBtn.classList.toggle('active', !vis);
+      });
+      toggleSidebarBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        toggleSidebarBtn.classList.toggle('active', !sidebar.classList.contains('collapsed'));
+      });
+
+      // ========== SIDEBAR ELEMENTS ==========
+      const elements = [
+        { label: 'H1', icon: '🔤', html: '<h1>H1</h1>\n' },
+        { label: 'H2', icon: '🔤', html: '<h2>H2</h2>\n' },
+        { label: 'H3', icon: '🔤', html: '<h3>H3</h3>\n' },
+        { label: 'H4', icon: '🔤', html: '<h4>H4</h4>\n' },
+        { label: 'P', icon: '¶', html: '<p>…</p>\n' },
+        { label: 'Img', icon: '🖼️', html: '<img src="../img/blogs/placeholder.png" alt="Image">\n<div class="image-caption">Caption</div>\n' },
+        { label: 'Code', icon: '💻', html: '<pre><code>// code\n</code></pre>\n' },
+        { label: 'Quote', icon: '💬', html: '<blockquote>Quote</blockquote>\n' },
+        { label: 'UL', icon: '📋', html: '<ul>\n  <li>Item</li>\n</ul>\n' },
+        { label: 'OL', icon: '🔢', html: '<ol>\n  <li>Step</li>\n</ol>\n' },
+        { label: 'Table', icon: '📊', html: '<table>\n  <tr><th>H</th></tr>\n  <tr><td>D</td></tr>\n</table>\n' },
+        { label: 'Prog', icon: '📶', html: '<p>73%</p>\n<div class="progress-bar"><div class="progress-fill" style="width:73%;"></div></div>\n' },
+        { label: 'Info', icon: 'ℹ️', html: '<div class="alert alert-info"><strong>Info:</strong> text</div>\n' },
+        { label: 'Success', icon: '✅', html: '<div class="alert alert-success"><strong>Ok:</strong> text</div>\n' },
+        { label: 'Warn', icon: '⚠️', html: '<div class="alert alert-warning"><strong>Warn:</strong> text</div>\n' },
+        { label: 'Danger', icon: '❌', html: '<div class="alert alert-danger"><strong>Err:</strong> text</div>\n' },
+        { label: 'Badge', icon: '🏷️', html: '<span class="badge badge-primary">New</span>\n' },
+        { label: 'HL', icon: '💡', html: '<div class="highlight-box"><p>Highlight</p></div>\n' },
+        { label: 'Tooltip', icon: '💬', html: '<span class="tooltip" data-tip="Tip">hover me</span>\n' },
+        { label: 'Comp', icon: '⚖️', html: '<div class="comparison-card"><div class="comparison-item"><h4>+</h4><ul><li>P</li></ul></div><div class="comparison-item"><h4>-</h4><ul><li>C</li></ul></div></div>\n' },
+        { label: 'Def', icon: '📖', html: '<dl><dt>Term</dt><dd>Def</dd></dl>\n' },
+        { label: 'Kbd', icon: '⌨️', html: '<kbd>Ctrl</kbd> + <kbd>C</kbd>\n' },
+        { label: 'Steps', icon: '🔢', html: '<ol class="steps"><li>Step 1</li><li>Step 2</li></ol>\n' },
+        { label: 'Gallery', icon: '🖼️', html: '<div class="image-gallery"><img src="../img/blogs/g1.png"><img src="../img/blogs/g2.png"></div>\n' },
+        { label: 'Tree', icon: '📁', html: '<div class="file-tree">📁 project/<br>&nbsp;&nbsp;├── 📄 file</div>\n' },
+        { label: 'Collapse', icon: '🔽', html: '<details><summary>Click</summary><div class="details-content"><p>Hidden</p></div></details>\n' },
+        { label: 'DYK', icon: '💡', html: '<div class="did-you-know"><div class="icon">💡</div><p><strong>Fact</strong> text</p></div>\n' },
+        { label: 'Tags', icon: '#️⃣', html: '<div class="tags"><span class="tag">#tag</span></div>\n' },
+        { label: 'Bio', icon: '👤', html: '<div class="author-bio"><img src="../img/blogs/author.jpg"><div class="author-info"><div class="author-name">Name</div><div class="author-desc">Bio</div></div></div>\n' },
+        { label: 'Comments', icon: '💬', html: '<div class="comments-section"><h2>Comments</h2><div class="comment"><div class="comment-author">User</div><div class="comment-text">Text</div></div></div>\n' },
+        { label: 'HR', icon: '➖', html: '<hr>\n' }
+      ];
+
+      function renderElementGrid() {
+        elementGrid.innerHTML = '';
+        elements.forEach(el => {
+          const btn = document.createElement('div');
+          btn.className = 'elem-btn';
+          btn.innerHTML = `<span class="icon">${el.icon}</span><span>${el.label}</span>`;
+          btn.addEventListener('mouseenter', () => {
+            const doc = previewIframe.contentDocument || previewIframe.contentWindow.document;
+            doc.open();
+            doc.write(`<html><head>${previewStyles}</head><body data-theme="dark"><div class="blog-post-container"><article class="blog-post">${el.html}</article></div></body></html>`);
+            doc.close();
+          });
+          btn.addEventListener('click', () => insertAtCursor(el.html));
+          elementGrid.appendChild(btn);
+        });
+      }
+      renderElementGrid();
+
+      syncAll();
+      updateColorPreview();
+    })();
+  </script>
+</body>
+</html>

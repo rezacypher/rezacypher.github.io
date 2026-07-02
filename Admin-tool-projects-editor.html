@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects Editor – RezaCypher</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family:'Segoe UI', system-ui, sans-serif;
+      background:#0a0a0a; color:#ccc;
+      display:flex; flex-direction:column; align-items:center;
+      min-height:100vh; padding:20px;
+    }
+    .container { max-width:1100px; width:100%; }
+    h1 { color:#c22; font-weight:300; letter-spacing:2px; margin:20px 0; border-left:4px solid #c22; padding-left:15px; }
+    .note {
+      background:#1a1a1a; border:1px solid #333; border-radius:12px;
+      padding:12px 20px; margin-bottom:20px; font-size:14px;
+    }
+    .note strong { color:#ff4040; }
+    .toolbar { display:flex; gap:15px; align-items:center; flex-wrap:wrap; margin-bottom:20px; }
+    button, .file-label {
+      background:#c22; color:#fff; border:none; padding:10px 20px;
+      border-radius:30px; font-size:14px; cursor:pointer;
+      letter-spacing:1px; transition:background 0.3s, box-shadow 0.3s;
+    }
+    button:hover, .file-label:hover { background:#ff4040; box-shadow:0 0 15px rgba(200,0,0,0.6); }
+    .file-label { background:#333; display:inline-block; }
+    #fileInput { display:none; }
+    .section-block {
+      background:#1a1a1a; border:1px solid #333;
+      border-radius:15px; padding:20px; margin-bottom:25px;
+    }
+    .section-title {
+      color:#c22; font-size:20px; margin-bottom:15px;
+      text-transform:uppercase; letter-spacing:2px;
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    .card-editor {
+      background:#111; border:1px solid #444;
+      border-radius:12px; padding:15px; margin-bottom:15px;
+    }
+    .card-header {
+      display:flex; gap:10px; align-items:center; margin-bottom:10px; flex-wrap:wrap;
+    }
+    .card-header input {
+      background:#0a0a0a; border:1px solid #555; color:#fff;
+      padding:8px; border-radius:8px; font-size:14px;
+    }
+    .card-header input[type="text"] { flex:1; min-width:120px; }
+    .image-input { flex:1; min-width:150px; }
+    .link-input { flex:1; min-width:150px; }
+    .delete-card-btn { background:#333; color:#f66; padding:6px 12px; border-radius:20px; font-size:12px; cursor:pointer; }
+    .timeline-editor { margin-top:10px; padding-left:15px; border-left:2px solid #c22; }
+    .timeline-entry { display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+    .timeline-entry input {
+      background:#0a0a0a; border:1px solid #555; color:#fff;
+      padding:6px; border-radius:6px; font-size:13px;
+    }
+    .timeline-entry .date-input { width:110px; }
+    .timeline-entry .desc-input { flex:1; min-width:150px; }
+    .add-btn {
+      background:#2a2a2a; color:#ccc; padding:5px 15px;
+      border-radius:20px; font-size:12px; cursor:pointer; margin-top:5px;
+    }
+    .export-area { margin-top:30px; }
+    pre {
+      background:#000; padding:15px; border-radius:10px;
+      overflow-x:auto; font-size:13px; color:#ccc;
+      white-space:pre-wrap; border:1px solid #333; max-height:400px;
+    }
+    .status-msg { color:#ff4040; margin:10px 0; font-size:14px; }
+    .img-preview {
+      width:40px; height:40px; object-fit:cover; border-radius:6px;
+      margin-left:5px; display:none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📁 Projects Editor</h1>
+    <div class="note">
+      <strong>📁 Image files:</strong> Place icons inside <code>img/projects/</code>. Enter the file name (e.g. <code>myicon.png</code>) in the "Image" field.<br>
+      <strong>🔗 Link:</strong> Optional URL – leave empty if none. The card becomes clickable if a link is provided.
+    </div>
+    <div class="toolbar">
+      <label class="file-label" for="fileInput">📂 Load projects.html</label>
+      <input type="file" id="fileInput" accept=".html">
+      <button id="addCardBtn">➕ Add Card (first section)</button>
+      <button id="exportBtn">💾 Export Full HTML</button>
+      <span class="status-msg" id="statusMsg"></span>
+    </div>
+
+    <div id="editorContainer">
+      <p style="color:#666;">Load a projects.html file to start editing.</p>
+    </div>
+
+    <div class="export-area" id="exportArea" style="display:none;">
+      <h3 style="color:#aaa; margin-bottom:10px;">Generated HTML – Copy or Save</h3>
+      <pre id="exportCode"></pre>
+      <button id="copyExportBtn">📋 Copy to Clipboard</button>
+    </div>
+  </div>
+
+  <script>
+    // ----- STATE -----
+    let currentSections = null;
+    let originalHTML = '';
+
+    const fileInput = document.getElementById('fileInput');
+    const editorContainer = document.getElementById('editorContainer');
+    const exportArea = document.getElementById('exportArea');
+    const exportCode = document.getElementById('exportCode');
+    const statusMsg = document.getElementById('statusMsg');
+
+    // ----- HELPERS -----
+    function escapeHtml(text) {
+      const map = { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;' };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    function isImageFilename(value) {
+      return value && /\.(png|jpg|jpeg|gif|svg|webp)$/i.test(value.trim());
+    }
+
+    // ----- PARSE projects.html -----
+    function parseProjectsHTML(htmlString) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlString, 'text/html');
+      const sections = [];
+      const sectionElements = doc.querySelectorAll('.cv-section');
+      sectionElements.forEach(sec => {
+        const titleEl = sec.querySelector('.section-title');
+        if (!titleEl) return;
+        const title = titleEl.textContent.trim();
+        if (!['Apps', 'Games', 'Others'].includes(title)) return;
+        const cards = [];
+        const cardElements = sec.querySelectorAll('.project-card');
+        cardElements.forEach(card => {
+          const id = card.id || '';
+          const nameEl = card.querySelector('.project-name');
+          const shortEl = card.querySelector('.project-short');
+          const iconEl = card.querySelector('.project-icon-placeholder');
+          const imgEl = card.querySelector('.project-icon img');
+          const name = nameEl ? nameEl.textContent.trim() : '';
+          const shortDesc = shortEl ? shortEl.textContent.trim() : '';
+          // Determine icon value
+          let icon = '📁';
+          if (imgEl) {
+            const src = imgEl.getAttribute('src') || '';
+            const parts = src.split('/');
+            icon = parts[parts.length-1];
+          } else if (iconEl) {
+            icon = iconEl.textContent.trim();
+          }
+          // Check for link: if card is inside an <a>, get href; else look for data-link attribute
+          let link = card.getAttribute('data-link') || '';
+          if (!link) {
+            const parentAnchor = card.closest('a');
+            if (parentAnchor) link = parentAnchor.getAttribute('href') || '';
+          }
+          // parse timeline
+          const timelineItems = [];
+          const timelineList = card.querySelector('.project-timeline');
+          if (timelineList) {
+            timelineList.querySelectorAll('li').forEach(li => {
+              const dateSpan = li.querySelector('.timeline-date');
+              const date = dateSpan ? dateSpan.textContent.trim() : '';
+              let fullText = li.textContent.trim();
+              if (dateSpan) fullText = fullText.replace(dateSpan.textContent, '').trim();
+              timelineItems.push({ date, desc: fullText });
+            });
+          }
+          cards.push({ id, name, icon, shortDesc, link, timelineItems });
+        });
+        sections.push({ title, cards });
+      });
+      return sections;
+    }
+
+    // ----- RENDER EDITOR FROM STATE -----
+    function renderEditor() {
+      editorContainer.innerHTML = '';
+      currentSections.forEach((section, secIndex) => {
+        const sectionDiv = document.createElement('div');
+        sectionDiv.className = 'section-block';
+        sectionDiv.innerHTML = `
+          <div class="section-title">
+            <span>${section.title}</span>
+            <button class="add-btn" data-section="${secIndex}">+ Add Card to ${section.title}</button>
+          </div>
+          <div class="cards-container" data-section-index="${secIndex}"></div>`;
+        const cardsContainer = sectionDiv.querySelector('.cards-container');
+        section.cards.forEach((card, cardIndex) => {
+          cardsContainer.appendChild(createCardEditor(card, secIndex, cardIndex));
+        });
+        editorContainer.appendChild(sectionDiv);
+      });
+      attachEvents();
+    }
+
+    function createCardEditor(card, secIndex, cardIndex) {
+      const div = document.createElement('div');
+      div.className = 'card-editor';
+      div.setAttribute('data-sec', secIndex);
+      div.setAttribute('data-card', cardIndex);
+      div.dataset.origId = card.id;
+      let previewHtml = '';
+      if (isImageFilename(card.icon)) {
+        previewHtml = `<img src="img/projects/${escapeHtml(card.icon)}" class="img-preview" onerror="this.style.display='none'" style="display:inline-block;">`;
+      }
+      div.innerHTML = `
+        <div class="card-header">
+          <input type="text" class="image-input" value="${escapeHtml(card.icon)}" placeholder="icon.png or emoji">
+          ${previewHtml}
+          <input type="text" class="name-input" value="${escapeHtml(card.name)}" placeholder="Project Name">
+          <input type="text" class="short-input" value="${escapeHtml(card.shortDesc)}" placeholder="Short description">
+          <input type="text" class="link-input" value="${escapeHtml(card.link)}" placeholder="https://link.to/project (optional)">
+          <button class="delete-card-btn">🗑️ Delete</button>
+        </div>
+        <div class="timeline-editor">
+          <h4 style="color:#aaa; margin-bottom:5px;">Timeline</h4>
+          <div class="timeline-list">
+            ${card.timelineItems.map((item, ti) => `
+              <div class="timeline-entry" data-ti="${ti}">
+                <input type="text" class="date-input" value="${escapeHtml(item.date)}" placeholder="YYYY/M/D">
+                <input type="text" class="desc-input" value="${escapeHtml(item.desc)}" placeholder="Description">
+                <button class="delete-btn add-btn" style="background:#333;color:#f66;">✕</button>
+              </div>
+            `).join('')}
+          </div>
+          <button class="add-btn add-timeline-btn">+ Add Timeline Entry</button>
+        </div>`;
+      return div;
+    }
+
+    // ----- COLLECT FORM DATA -----
+    function collectFormData() {
+      const sections = [];
+      document.querySelectorAll('.section-block').forEach(secEl => {
+        const title = secEl.querySelector('.section-title span').textContent;
+        const cards = [];
+        secEl.querySelectorAll('.card-editor').forEach(cardEl => {
+          const imageInput = cardEl.querySelector('.image-input');
+          const nameInput = cardEl.querySelector('.name-input');
+          const shortInput = cardEl.querySelector('.short-input');
+          const linkInput = cardEl.querySelector('.link-input');
+          const timelineEntries = [];
+          cardEl.querySelectorAll('.timeline-entry').forEach(entryEl => {
+            const dateInput = entryEl.querySelector('.date-input');
+            const descInput = entryEl.querySelector('.desc-input');
+            timelineEntries.push({
+              date: dateInput ? dateInput.value.trim() : '',
+              desc: descInput ? descInput.value.trim() : ''
+            });
+          });
+          const origId = cardEl.dataset.origId || '';
+          cards.push({
+            id: origId || 'proj-' + Math.random().toString(36).substr(2, 9),
+            name: nameInput ? nameInput.value.trim() : '',
+            icon: imageInput ? imageInput.value.trim() : '',
+            shortDesc: shortInput ? shortInput.value.trim() : '',
+            link: linkInput ? linkInput.value.trim() : '',
+            timelineItems: timelineEntries
+          });
+        });
+        sections.push({ title, cards });
+      });
+      currentSections = sections;
+    }
+
+    // ----- EVENT HANDLING -----
+    function attachEvents() {
+      document.querySelectorAll('.delete-card-btn').forEach(btn => {
+        btn.onclick = (e) => {
+          const cardEl = e.target.closest('.card-editor');
+          const secIndex = parseInt(cardEl.dataset.sec);
+          const cardIndex = parseInt(cardEl.dataset.card);
+          if (confirm('Delete this card?')) {
+            currentSections[secIndex].cards.splice(cardIndex, 1);
+            renderEditor();
+          }
+        };
+      });
+      document.querySelectorAll('.add-timeline-btn').forEach(btn => {
+        btn.onclick = (e) => {
+          const cardEl = e.target.closest('.card-editor');
+          const secIndex = parseInt(cardEl.dataset.sec);
+          const cardIndex = parseInt(cardEl.dataset.card);
+          currentSections[secIndex].cards[cardIndex].timelineItems.push({ date:'', desc:'' });
+          renderEditor();
+        };
+      });
+      document.querySelectorAll('.timeline-entry .delete-btn').forEach(btn => {
+        btn.onclick = (e) => {
+          const entryEl = e.target.closest('.timeline-entry');
+          const ti = parseInt(entryEl.dataset.ti);
+          const cardEl = entryEl.closest('.card-editor');
+          const secIndex = parseInt(cardEl.dataset.sec);
+          const cardIndex = parseInt(cardEl.dataset.card);
+          currentSections[secIndex].cards[cardIndex].timelineItems.splice(ti, 1);
+          renderEditor();
+        };
+      });
+      document.querySelectorAll('[data-section]').forEach(btn => {
+        btn.onclick = (e) => {
+          const secIndex = parseInt(btn.dataset.section);
+          currentSections[secIndex].cards.push({
+            id: 'new-' + Date.now(),
+            name: 'New Project',
+            icon: '',
+            shortDesc: 'Description',
+            link: '',
+            timelineItems: []
+          });
+          renderEditor();
+        };
+      });
+      document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', () => collectFormData());
+      });
+    }
+
+    // ----- EXPORT FULL HTML -----
+    function generateUpdatedHTML() {
+      collectFormData();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(originalHTML, 'text/html');
+      const mainEl = doc.querySelector('.cv-main');
+      if (!mainEl) { alert('Could not find <main> in original HTML.'); return ''; }
+      let newContent = '';
+      currentSections.forEach(sec => {
+        newContent += `
+        <section class="cv-section">
+          <h2 class="section-title">${sec.title}</h2>
+          <div class="projects-grid">`;
+        sec.cards.forEach(card => {
+          // Build icon HTML
+          let iconHtml = '';
+          if (isImageFilename(card.icon)) {
+            iconHtml = `<img src="img/projects/${escapeHtml(card.icon)}" alt="${escapeHtml(card.name)}" style="width:100%; height:100%; object-fit:cover;">`;
+          } else {
+            const emoji = card.icon || '📁';
+            iconHtml = `<div class="project-icon-placeholder">${escapeHtml(emoji)}</div>`;
+          }
+          // Build card content
+          let cardContent = `
+              <div class="project-icon">
+                ${iconHtml}
+              </div>
+              <h3 class="project-name">${escapeHtml(card.name)}</h3>
+              <p class="project-short">${escapeHtml(card.shortDesc)}</p>
+              <button class="toggle-expand" data-target="${escapeHtml(card.id)}">Details</button>
+              <div class="expandable-content" style="display: none;">
+                <ul class="project-timeline">`;
+          card.timelineItems.forEach(item => {
+            if (item.date || item.desc) {
+              cardContent += `
+                  <li><span class="timeline-date">${escapeHtml(item.date)}</span> ${escapeHtml(item.desc)}</li>`;
+            }
+          });
+          cardContent += `
+                </ul>
+              </div>`;
+          // Wrap in <a> if link exists, else regular div
+          if (card.link) {
+            newContent += `
+            <a href="${escapeHtml(card.link)}" target="_blank" rel="noopener" class="project-card expandable-section" id="${escapeHtml(card.id)}" style="text-decoration:none; color:inherit; display:block;">
+              ${cardContent}
+            </a>`;
+          } else {
+            newContent += `
+            <div class="project-card expandable-section" id="${escapeHtml(card.id)}">
+              ${cardContent}
+            </div>`;
+          }
+        });
+        newContent += `
+          </div>
+        </section>`;
+      });
+      mainEl.innerHTML = newContent;
+      return '<!DOCTYPE html>\n' + doc.documentElement.outerHTML;
+    }
+
+    function exportHTML() {
+      const updated = generateUpdatedHTML();
+      if (!updated) return;
+      exportCode.textContent = updated;
+      exportArea.style.display = 'block';
+    }
+
+    // ----- FILE LOADING -----
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        originalHTML = ev.target.result;
+        currentSections = parseProjectsHTML(originalHTML);
+        if (currentSections.length === 0) {
+          statusMsg.textContent = 'No sections found (make sure there are Apps, Games, Others sections).';
+        } else {
+          const total = currentSections.reduce((sum, s) => sum + s.cards.length, 0);
+          statusMsg.textContent = `Loaded ${total} project(s) across ${currentSections.length} sections.`;
+          renderEditor();
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById('addCardBtn').addEventListener('click', () => {
+      if (!currentSections || currentSections.length === 0) {
+        alert('Load a file first.');
+        return;
+      }
+      currentSections[0].cards.push({
+        id: 'new-' + Date.now(),
+        name: 'New Project',
+        icon: '',
+        shortDesc: 'Description',
+        link: '',
+        timelineItems: []
+      });
+      renderEditor();
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', exportHTML);
+    document.getElementById('copyExportBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(exportCode.textContent).then(() => {
+        alert('Copied to clipboard!');
+      });
+    });
+  </script>
+</body>
+</html>

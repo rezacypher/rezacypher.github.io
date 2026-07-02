@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>RezaCypher · Projects</title>
+  <link rel="stylesheet" href="style.main.css">
+  <link rel="stylesheet" href="style.projects.css">
+</head>
+<body data-theme="dark">
+  <canvas id="hexCanvas"></canvas>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="sidebar" id="sidebar">
+    <div style="text-align: center; margin-bottom: 20px;">
+      <h3 style="color: var(--accent-primary); text-transform: uppercase; letter-spacing: 2px;">Menu</h3>
+    </div>
+    <div class="sidebar-grid">
+      <a href="cv.html" class="sidebar-item" data-section="cv"><span class="sidebar-icon">📄</span><span class="sidebar-label">CV</span></a>
+      <a href="projects.html" class="sidebar-item active" data-section="projects"><span class="sidebar-icon">📁</span><span class="sidebar-label">Projects</span></a>
+      <a href="blogs.html" class="sidebar-item" data-section="blogs"><span class="sidebar-icon">📝</span><span class="sidebar-label">Blogs</span></a>
+      <a href="socialmedia.html" class="sidebar-item" data-section="social"><span class="sidebar-icon">💬</span><span class="sidebar-label">Social</span></a>
+    </div>
+  </div>
+
+  <div class="content">
+    <header class="portfolio-header" id="mainHeader">
+      <div class="header-logo-area">
+        <div class="header-logo" id="headerLogo">
+          <img src="img/cypherlogo_s.png" class="logo-light" alt="RezaCypher Logo" style="display:none;">
+          <img src="img/cypherlogo_s_black.png" class="logo-dark" alt="RezaCypher Logo">
+        </div>
+        <div class="header-text">
+          <span class="header-title">RezaCypher</span>
+          <span class="header-subtitle" id="currentPage">PROJECTS</span>
+        </div>
+      </div>
+      <div class="header-controls">
+        <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+        <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar">☰</button>
+      </div>
+    </header>
+
+    <main class="cv-main" id="cvContent">
+      <div class="cv-container">
+
+        <!-- Apps Section -->
+        <section class="cv-section">
+          <h2 class="section-title">Apps</h2>
+          <div class="projects-grid">
+
+            <!-- License Verification Tool -->
+            <div class="project-card expandable-section" id="license-tool">
+              <div class="project-icon">
+                <div class="project-icon-placeholder">🔐</div>
+              </div>
+              <h3 class="project-name">License Verification Tool</h3>
+              <p class="project-short">C# app that protects Python files from exposure.</p>
+              <button class="toggle-expand" data-target="license-tool">Details</button>
+              <div class="expandable-content" style="display: none;">
+                <ul class="project-timeline">
+                  <li><span class="timeline-date">2021/8/13</span> v1.3 Final – Finished creating the protection app.</li>
+                  <li><span class="timeline-date">2021/7/27</span> v1.2 – Added multiple launching methods for Python files.</li>
+                  <li><span class="timeline-date">2021/7/13</span> v1.1 – Established unique machine/windows user ID as license key.</li>
+                  <li><span class="timeline-date">2021/6/20</span> v1.0 – Started C# project to protect Python files.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Routine (Android) -->
+            <div class="project-card expandable-section" id="routine">
+              <div class="project-icon">
+                <div class="project-icon-placeholder">📅</div>
+              </div>
+              <h3 class="project-name">Routine (Android)</h3>
+              <p class="project-short">Weekly schedule planner – discontinued due to sanctions.</p>
+              <button class="toggle-expand" data-target="routine">Details</button>
+              <div class="expandable-content" style="display: none;">
+                <ul class="project-timeline">
+                  <li><span class="timeline-date">2021/6/20</span> Discontinued – Sanctions blocked SDK downloads for Android 8.1+.</li>
+                  <li><span class="timeline-date">2021/6/20</span> Beta update 5 – Notebook complete with 37 fonts + colour customisation.</li>
+                  <li><span class="timeline-date">2021/6/20</span> Beta update 4 – Security PIN password for app protection.</li>
+                  <li><span class="timeline-date">2021/6/20</span> Beta update 3 – HTML share & print functionality.</li>
+                  <li><span class="timeline-date">2021/6/20</span> Beta update 2 – Supports up to 6 different plans.</li>
+                  <li><span class="timeline-date">2021/6/20</span> Beta update 1 – Core functionality working.</li>
+                  <li><span class="timeline-date">2021/6/20</span> Beta – Started Android project to manage weekly schedule.</li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Games Section -->
+        <section class="cv-section">
+          <h2 class="section-title">Games</h2>
+          <div class="projects-grid">
+
+            <!-- Errant Ghosts Mod -->
+            <div class="project-card expandable-section" id="errant-ghosts">
+              <div class="project-icon">
+                <div class="project-icon-placeholder">👻</div>
+              </div>
+              <h3 class="project-name">Errant Ghosts Mod</h3>
+              <p class="project-short">Game mod released on GameBanana.com.</p>
+              <button class="toggle-expand" data-target="errant-ghosts">Details</button>
+              <div class="expandable-content" style="display: none;">
+                <ul class="project-timeline">
+                  <li><span class="timeline-date">2023/2/26</span> v1.0 – Released on GameBanana.com.</li>
+                  <li><span class="timeline-date">2023/2/26</span> First version ready for upload.</li>
+                  <li><span class="timeline-date">2023/2/26</span> Originally worked on this mod 5 years ago; resumed development.</li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Others Section (Websites, Security, Portfolio) -->
+        <section class="cv-section">
+          <h2 class="section-title">Others</h2>
+          <div class="projects-grid">
+
+            <!-- Licensing & Security (Codemate) -->
+            <div class="project-card expandable-section" id="licensing-security">
+              <div class="project-icon">
+                <div class="project-icon-placeholder">🛡️</div>
+              </div>
+              <h3 class="project-name">Licensing & Security</h3>
+              <p class="project-short">Protected Python sources with C#, generated license keys.</p>
+              <button class="toggle-expand" data-target="licensing-security">Details</button>
+              <div class="expandable-content" style="display: none;">
+                <ul class="project-timeline">
+                  <li><span class="timeline-date">2021</span> Created unique machine‑ID‑based license keys for Python applications.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- WordPress Website Design -->
+            <div class="project-card expandable-section" id="wordpress-site">
+              <div class="project-icon">
+                <div class="project-icon-placeholder">🍰</div>
+              </div>
+              <h3 class="project-name">WordPress Website</h3>
+              <p class="project-short">Designed for natliland.ir – baking tutorials shop.</p>
+              <button class="toggle-expand" data-target="wordpress-site">Details</button>
+              <div class="expandable-content" style="display: none;">
+                <ul class="project-timeline">
+                  <li><span class="timeline-date">2021</span> Built and managed a WordPress site for selling baking &amp; chocolate tutorials. (Startup failed)</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Android App for Business -->
+            <div class="project-card expandable-section" id="android-app">
+              <div class="project-icon">
+                <div class="project-icon-placeholder">📱</div>
+              </div>
+              <h3 class="project-name">Android App for Business</h3>
+              <p class="project-short">Native Android app for natliland.ir.</p>
+              <button class="toggle-expand" data-target="android-app">Details</button>
+              <div class="expandable-content" style="display: none;">
+                <ul class="project-timeline">
+                  <li><span class="timeline-date">2021</span> Developed a companion Android app for the WordPress site. (Project stalled)</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Portfolio Site -->
+            <div class="project-card expandable-section" id="portfolio-site">
+              <div class="project-icon">
+                <div class="project-icon-placeholder">🌐</div>
+              </div>
+              <h3 class="project-name">Portfolio Site</h3>
+              <p class="project-short">This very portfolio – built with vanilla HTML/CSS/JS.</p>
+              <button class="toggle-expand" data-target="portfolio-site">Details</button>
+              <div class="expandable-content" style="display: none;">
+                <ul class="project-timeline">
+                  <li><span class="timeline-date">2024</span> Custom‑built portfolio with dynamic hex background, custom cursor, and theme switching.</li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <footer class="portfolio-footer" id="mainFooter">
+      <a href="cv.html" class="footer-link" data-section="cv">CV</a>
+      <a href="projects.html" class="footer-link active" data-section="projects">Projects</a>
+      <a href="blogs.html" class="footer-link" data-section="blogs">Blogs</a>
+      <a href="socialmedia.html" class="footer-link" data-section="social">Social Media</a>
+    </footer>
+  </div>
+
+  <script src="script.main.js"></script>
+  <script src="script.projects.js"></script>
+  <script src="script.cursor.js"></script>
+</body>
+</html>

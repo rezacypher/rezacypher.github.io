@@ -1,0 +1,165 @@
+/* ===== PROJECTS PAGE STYLES ===== */
+.cv-container {
+  max-width: 1400px; margin: 0 auto;
+  display: flex; flex-direction: column; gap: 40px;
+}
+
+/* Section card – same as CV for consistency */
+.cv-section {
+  background: rgba(18,18,18,0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 30px;
+}
+[data-theme="light"] .cv-section { background: rgba(255,255,255,0.7); }
+
+.section-title {
+  font-size: 24px; font-weight: 300; letter-spacing: 3px;
+  color: var(--accent-primary); text-transform: uppercase;
+  border-left: 4px solid var(--accent-primary); padding-left: 16px;
+  margin-bottom: 25px; text-shadow: 0 0 8px var(--accent-glow);
+  align-self: stretch;
+}
+
+/* Projects grid – large icons like Windows 10 extra‑large */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 25px;
+  margin-top: 10px;
+}
+
+/* Individual project card (launcher icon style) */
+.project-card {
+  background: var(--header-bg);                /* theme‑aware semi‑transparent */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 25px 15px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.3s ease;
+  text-decoration: none;                      /* in case it's an <a> */
+  color: var(--text-primary);
+}
+.project-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--accent-primary);
+  box-shadow: 0 8px 25px var(--accent-primary);
+}
+
+/* Placeholder icon – Windows 10 extra large size */
+.project-icon {
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24px;
+  background: rgba(128,128,128,0.15);         /* neutral tint, works on both themes */
+  overflow: hidden;
+}
+/* light‑theme adjustment for icon background */
+[data-theme="light"] .project-icon {
+  background: rgba(0,0,0,0.05);
+}
+
+.project-icon-placeholder {
+  font-size: 70px;
+  opacity: 0.8;
+}
+
+.project-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.project-short {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 15px;
+  flex: 1;
+}
+
+/* Details button */
+.project-card .toggle-expand {
+  display: inline-block;
+  background: transparent;
+  border: 1px solid var(--accent-primary);
+  color: var(--accent-primary);
+  padding: 6px 16px;
+  border-radius: 16px;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: auto;
+}
+.project-card .toggle-expand:hover {
+  background: var(--accent-primary);
+  color: #fff;
+  box-shadow: 0 0 12px var(--accent-primary);
+}
+
+/* Timeline list inside expanded card */
+.project-timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  width: 100%;
+}
+.project-timeline li {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.project-timeline li:last-child {
+  border-bottom: none;
+}
+.project-timeline .timeline-date {
+  color: var(--accent-primary);
+  font-weight: 600;
+  margin-right: 5px;
+}
+
+/* Placeholder card (Others) */
+.placeholder-card .project-icon-placeholder {
+  opacity: 0.5;
+}
+
+/* Light‑theme overrides for project card background */
+[data-theme="light"] .project-card {
+  background: rgba(255,255,255,0.6);          /* light blur */
+}
+/* Optional: lighten the section card even more in light mode – already handled by the shared .cv-section rule */
+
+/* Responsive icon size on mobile */
+@media (max-width: 900px) {
+  .projects-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+  .project-icon {
+    width: 130px;
+    height: 130px;
+  }
+  .project-icon-placeholder {
+    font-size: 50px;
+  }
+}
+@media (max-width: 600px) {
+  .cv-section { padding: 20px; }
+}

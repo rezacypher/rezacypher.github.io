@@ -1,0 +1,198 @@
+/* ===== CV PAGE LAYOUT ===== */
+.cv-container {
+  max-width: 1400px; margin: 0 auto;
+  display: flex; flex-direction: column; gap: 40px;
+}
+
+/* Make links in the certifications list follow the accent color */
+.cert-list a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--accent-primary);
+}
+.cert-list a:hover {
+  text-shadow: 0 0 8px var(--accent-glow);
+  border-bottom: 1px solid var(--accent-primary);
+}
+
+/* Top row: 2 columns */
+.top-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  align-items: stretch;
+}
+
+/* Second row: 2 columns */
+.second-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+/* Generic section card */
+.cv-section {
+  background: rgba(18,18,18,0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+}
+[data-theme="light"] .cv-section { background: rgba(255,255,255,0.7); }
+
+/* Skills section – centers honeycomb */
+.skills-photo-section {
+  align-items: center;
+  overflow-x: hidden;
+}
+
+.section-title {
+  font-size: 24px; font-weight: 300; letter-spacing: 3px;
+  color: var(--accent-primary); text-transform: uppercase;
+  border-left: 4px solid var(--accent-primary); padding-left: 16px;
+  margin-bottom: 25px; text-shadow: 0 0 8px var(--accent-glow);
+  align-self: stretch;
+}
+
+/* About section text */
+.about-text p { margin-bottom: 16px; line-height: 1.7; color: var(--text-secondary); }
+.about-quote { font-style: italic; opacity: 0.9; border-left: 2px solid var(--accent-primary); padding-left: 16px; }
+
+/* ----- PHOTO HEXAGON (larger) ----- */
+.photo-hex-container {
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+}
+.photo-hex-container .hex-bg-border {
+  stroke: var(--accent-primary);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 8px var(--accent-glow));
+  stroke-dasharray: 6 4;
+  animation: dashAnim 4s linear infinite;
+}
+
+/* ----- SKILL HONEYCOMB (tight, 5 cells) ----- */
+:root {
+  --hex-side: 80px;               /* fallback, overridden by JS */
+  --hex-width: calc(var(--hex-side) * 1.732);
+  --hex-height: calc(var(--hex-side) * 2);
+}
+
+.honeycomb {
+  position: relative;
+  width: calc(1.5 * var(--hex-width));
+  height: calc(4 * var(--hex-height));   /* 5 rows (0-4) */
+  margin: 0 auto;
+  overflow: visible;
+  max-width: 100%;
+}
+
+.hex-svg-cell {
+  position: absolute;
+  width: var(--hex-width);
+  height: var(--hex-height);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  transform-origin: center center;
+}
+
+/* Row positions (0‑4) */
+.honeycomb .hex-svg-cell[data-row="0"] { left: 0; top: 0; }
+.honeycomb .hex-svg-cell[data-row="1"] { left: calc(var(--hex-width) / 2); top: calc(var(--hex-height) * 0.75); }
+.honeycomb .hex-svg-cell[data-row="2"] { left: 0; top: calc(var(--hex-height) * 1.5); }
+.honeycomb .hex-svg-cell[data-row="3"] { left: calc(var(--hex-width) / 2); top: calc(var(--hex-height) * 2.25); }
+.honeycomb .hex-svg-cell[data-row="4"] { left: 0; top: calc(var(--hex-height) * 3); }
+
+.hex-svg-cell:hover {
+  transform: scale(1.08);
+  z-index: 2;
+}
+
+.skill-svg-cell .hex-bg-border {
+  stroke: rgba(128,128,128,0.3);
+  stroke-width: 3;
+}
+.skill-svg-cell .hex-progress-ring {
+  stroke: var(--accent-primary);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 6px var(--accent-glow));
+}
+
+.hex-default-text, .hex-hover-text {
+  transition: opacity 0.3s ease;
+}
+.hex-hover-text {
+  opacity: 0;
+  pointer-events: none;
+}
+.hex-svg-cell:hover .hex-default-text {
+  opacity: 0;
+}
+.hex-svg-cell:hover .hex-hover-text {
+  opacity: 1;
+}
+
+/* Timeline, education, etc. (CV specific) */
+.timeline { display: flex; flex-direction: column; gap: 20px; }
+.timeline-item { display: flex; gap: 15px; align-items: flex-start; }
+.timeline-dot {
+  width: 12px; height: 12px; background: var(--accent-primary);
+  border-radius: 50%; margin-top: 8px;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+.timeline-content h3 { color: var(--text-primary); margin-bottom: 5px; }
+.timeline-date { display: block; font-size: 13px; color: var(--accent-primary); margin-bottom: 5px; }
+
+.education-card h3 { margin-bottom: 5px; }
+.education-date { display: block; font-size: 14px; color: var(--accent-primary); margin-bottom: 5px; }
+
+.cert-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.cert-list li::before { content: "◆ "; color: var(--accent-primary); }
+
+.project-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+.project-card {
+  padding: 20px; background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border-color); border-radius: 12px;
+  transition: all 0.3s;
+}
+.project-card:hover { border-color: var(--accent-primary); box-shadow: 0 0 15px var(--accent-primary); }
+
+.languages-list { display: flex; gap: 12px; flex-wrap: wrap; }
+.language-badge {
+  padding: 8px 18px; background: var(--accent-primary);
+  color: #fff; border-radius: 20px; font-weight: 600; letter-spacing: 1px;
+}
+
+.soft-skills-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+.soft-skill {
+  padding: 10px 18px; border: 1px solid var(--accent-primary);
+  border-radius: 30px; font-size: 14px;
+  color: var(--text-primary); transition: 0.3s;
+}
+.soft-skill:hover { background: var(--accent-primary); color: #fff; }
+
+.contact-details p { margin-bottom: 10px; }
+
+/* Expand button (CV) */
+.expandable-section .toggle-expand {
+  display: inline-block; margin-top: 20px;
+  background: transparent; border: 1px solid var(--accent-primary);
+  color: var(--accent-primary); padding: 8px 20px;
+  border-radius: 20px; font-size: 14px; letter-spacing: 1px;
+  text-transform: uppercase; cursor: pointer; transition: all 0.3s;
+}
+.toggle-expand:hover { background: var(--accent-primary); color: #fff; box-shadow: 0 0 15px var(--accent-primary); }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .top-row, .second-row {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 600px) {
+  .cv-section { padding: 20px; }
+}

@@ -1,0 +1,85 @@
+/* ===== HOMEPAGE SPECIFIC STYLES ===== */
+
+/* The content container already flexes column-wise, 
+   we need the main to take remaining space and center itself */
+.home-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;          /* vertical centering */
+  text-align: center;
+  padding: 40px 20px;
+  /* Add bottom padding equal to footer height to avoid overlap */
+  padding-bottom: 100px;
+  pointer-events: auto;
+}
+
+/* Large center logo – can hold either text or an image */
+.home-logo {
+  font-size: clamp(6rem, 15vw, 12rem);
+  font-weight: 800;
+  color: var(--accent-primary);
+  text-shadow: 0 0 40px var(--accent-glow), 0 0 20px var(--accent-secondary);
+  letter-spacing: 4px;
+  user-select: none;
+  animation: logoPulse 3s ease-in-out infinite;
+  cursor: default;
+  margin-bottom: 30px;
+  /* If you later use an <img>, you can adjust size */
+}
+
+.home-logo .logo-text {
+  display: block;
+}
+
+/* When you replace with an actual image */
+.home-logo img {
+  width: 200px;
+  height: auto;
+  filter: drop-shadow(0 0 20px var(--accent-glow));
+}
+
+@keyframes logoPulse {
+  0%, 100% { transform: scale(1); text-shadow: 0 0 40px var(--accent-glow), 0 0 20px var(--accent-secondary); }
+  50% { transform: scale(1.05); text-shadow: 0 0 60px var(--accent-glow), 0 0 30px var(--accent-primary); }
+}
+
+/* Question container */
+.home-question {
+  font-size: 1.4rem;
+  font-weight: 300;
+  color: var(--text-primary);
+  max-width: 600px;
+  padding: 20px;
+  background: var(--header-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  animation: fadeSlideUp 0.8s ease-out;
+  line-height: 1.6;
+  text-shadow: 0 0 8px var(--accent-glow);
+  /* Ensure it's above footer when scrolling */
+  z-index: 5;
+}
+
+[data-theme="light"] .home-question {
+  background: rgba(255,255,255,0.7);
+}
+
+@keyframes fadeSlideUp {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .home-logo {
+    font-size: 4rem;
+  }
+  .home-question {
+    font-size: 1.1rem;
+    padding: 15px;
+  }
+}

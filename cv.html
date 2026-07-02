@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>RezaCypher · CV</title>
+  <link rel="stylesheet" href="style.main.css">
+  <link rel="stylesheet" href="style.cv.css">
+  <style>
+    /* Make links in the certifications list follow the accent color */
+    .cert-list a {
+      color: var(--accent-primary);
+      text-decoration: none;
+      border-bottom: 1px dotted var(--accent-primary);
+    }
+    .cert-list a:hover {
+      text-shadow: 0 0 8px var(--accent-glow);
+      border-bottom: 1px solid var(--accent-primary);
+    }
+  </style>
+</head>
+<body data-theme="dark">
+  <canvas id="hexCanvas"></canvas>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="sidebar" id="sidebar">
+    <div style="text-align: center; margin-bottom: 20px;">
+      <h3 style="color: var(--accent-primary); text-transform: uppercase; letter-spacing: 2px;">Menu</h3>
+    </div>
+    <div class="sidebar-grid">
+      <a href="cv.html" class="sidebar-item active" data-section="cv"><span class="sidebar-icon">📄</span><span class="sidebar-label">CV</span></a>
+      <a href="projects.html" class="sidebar-item" data-section="projects"><span class="sidebar-icon">📁</span><span class="sidebar-label">Projects</span></a>
+      <a href="blogs.html" class="sidebar-item" data-section="blogs"><span class="sidebar-icon">📝</span><span class="sidebar-label">Blogs</span></a>
+      <a href="socialmedia.html" class="sidebar-item" data-section="social"><span class="sidebar-icon">💬</span><span class="sidebar-label">Social</span></a>
+    </div>
+  </div>
+
+  <div class="content">
+    <header class="portfolio-header" id="mainHeader">
+      <div class="header-logo-area">
+        <div class="header-logo" id="headerLogo">
+          <img src="img/cypherlogo_s.png" class="logo-light" alt="RezaCypher Logo" style="display:none;">
+          <img src="img/cypherlogo_s_black.png" class="logo-dark" alt="RezaCypher Logo">
+        </div>
+        <div class="header-text">
+          <span class="header-title">RezaCypher</span>
+          <span class="header-subtitle" id="currentPage">CV</span>
+        </div>
+      </div>
+      <div class="header-controls">
+        <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+        <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar">☰</button>
+      </div>
+    </header>
+
+    <main class="cv-main" id="cvContent">
+      <div class="cv-container">
+
+        <!-- Top row: Me & My Skills (left) + About Me (right) -->
+        <div class="top-row">
+          <section class="cv-section skills-photo-section">
+            <h2 class="section-title">Me & My Skills</h2>
+            <div class="photo-hex-container" id="photoContainer"></div>
+            <div class="honeycomb" id="honeycomb"></div>
+          </section>
+
+          <section class="cv-section about-section" id="about">
+            <h2 class="section-title">About Me</h2>
+            <div class="about-text">
+              <p>My name is <strong>MohammadReza MajidPour</strong>.</p>
+              <p>I became a code analyst not by choice – according to my needs I had to learn and acquire new skills for the tasks at hand. Before I knew it, I had vast knowledge about coding and could understand the purpose of code in front of me without knowing the language.</p>
+              <p>I have a degree in computer software engineering. I'm deeply interested in C#, Python, and Java, and because of my experience, I master object‑oriented languages faster. I'm also proficient in UI design for software and websites.</p>
+              <p>Born on November 12, 1997. People describe me as patient, contented, kind, and compassionate. I always look at issues from the other person's perspective and never make hasty decisions. I love first‑person and open‑world video games, and the combination of black and red.</p>
+              <p>Like the gears of a clock, every part must do its job correctly – I am exactly that gear. I thrive with Agile and Scrum, and if a company has its own unique workflow, I adapt effortlessly. In any case, I dedicate myself fully to the conditions.</p>
+              <p>Of course I get help from AI – if a blind man suddenly gains the gift of sight, will he still walk with his eyes closed? I use AI as a tool, not a crutch. It helps me overcome mental blocks, explore solutions faster, and refine my code until it truly feels like my own. AI is my collaborator, never my replacement.</p>
+              <p>Great things are never built alone. While I take full ownership of my work, I believe in the power of collaboration — whether it's with colleagues, open‑source communities, or even AI assistants. If you want to go fast, go alone; if you want to go far, go together. I find the sweet spot where independence meets teamwork, because that's where real innovation happens.</p>
+              <p class="about-quote">"If a blind man suddenly gains the gift of sight, will he still walk with his eyes closed?" – I use AI as a tool, not a crutch.</p>
+            </div>
+          </section>
+        </div>
+
+        <!-- Work Experience (styled as project cards) -->
+        <section class="cv-section expandable-section" id="experience">
+          <h2 class="section-title">Work Experience</h2>
+          <div class="project-grid">
+
+            <!-- Freelancer (since 2016) -->
+            <div class="project-card expandable-section" id="job-freelancer">
+              <div class="project-icon">
+                <div class="project-icon-placeholder">💼</div>
+              </div>
+              <h3 class="project-name">Freelancer</h3>
+              <p class="project-short">Self‑employed · 2016 – Present</p>
+              <button class="toggle-expand" data-target="job-freelancer">Details</button>
+              <div class="expandable-content" style="display: none;">
+                <ul class="project-timeline">
+                  <li><span class="timeline-date">Since 2016</span> Website Design – crafted responsive, user‑friendly websites for small businesses and personal brands.</li>
+                  <li><span class="timeline-date">Since 2016</span> Software Design – developed desktop utilities and mobile apps tailored to client needs.</li>
+                  <li><span class="timeline-date">Since 2016</span> Website Management – handled hosting, updates, security patches, and SEO for ongoing projects.</li>
+                  <li><span class="timeline-date">Since 2016</span> Scripting – wrote automation scripts in Python &amp; Bash to streamline repetitive tasks.</li>
+                  <li><span class="timeline-date">Since 2016</span> Data Analysis – cleaned, processed, and visualised datasets using Python, Excel, and SQL.</li>
+                  <li><span class="timeline-date">Since 2016</span> Automation – built workflows that reduced manual input by up to 60% for several clients.</li>
+                  <li><span class="timeline-date">Since 2016</span> Web Design – created modern UI mockups and prototypes with Figma and Adobe XD.</li>
+                  <li><span class="timeline-date">Since 2016</span> Image Processing – performed batch photo editing, background removal, and color correction.</li>
+                  <li><span class="timeline-date">Since 2016</span> Artificial Intelligence – experimented with ML models for classification and recommendation systems.</li>
+                  <li><span class="timeline-date">Since 2016</span> Content Creation – produced tech‑focused articles, tutorials, and video scripts.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Teacher -->
+            <div class="project-card expandable-section" id="job-teacher">
+              <div class="project-icon">
+                <div class="project-icon-placeholder">🎓</div>
+              </div>
+              <h3 class="project-name">Teacher</h3>
+              <p class="project-short">Private tutor · 2018 – Present</p>
+              <button class="toggle-expand" data-target="job-teacher">Details</button>
+              <div class="expandable-content" style="display: none;">
+                <ul class="project-timeline">
+                  <li><span class="timeline-date">2018 – Present</span> Teaching English – used modern communicative methods, drilling techniques, and real‑life scenarios. Improved students’ speaking fluency by an average of 40% in three months.</li>
+                  <li><span class="timeline-date">2018 – Present</span> Teaching Python – conducted hands‑on programming classes, guiding beginners from fundamentals to building real‑world projects.</li>
+                  <li><span class="timeline-date">2018 – Present</span> Computer Skills – instructed students in essential IT skills: operating systems, office suites, internet safety, and basic troubleshooting.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Maintenance · Kiosk Burger -->
+            <div class="project-card expandable-section" id="job-kiosk">
+              <div class="project-icon">
+                <div class="project-icon-placeholder">🔧</div>
+              </div>
+              <h3 class="project-name">Maintenance</h3>
+              <p class="project-short">Kiosk Burger · Feb 2023 – Dec 2023</p>
+              <button class="toggle-expand" data-target="job-kiosk">Details</button>
+              <div class="expandable-content" style="display: none;">
+                <ul class="project-timeline">
+                  <li><span class="timeline-date">2023</span> Responsible for periodic maintenance of computers, prevention of failures, emergency repairs, updating and upgrading equipment, database backups.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Website Creator & Manager (Bobogamez + natliland) -->
+            <div class="project-card expandable-section" id="job-website">
+              <div class="project-icon">
+                <div class="project-icon-placeholder">🌐</div>
+              </div>
+              <h3 class="project-name">Website Creator &amp; Manager</h3>
+              <p class="project-short">Bobogamez.com &amp; natliland.ir · 2019‑2021</p>
+              <button class="toggle-expand" data-target="job-website">Details</button>
+              <div class="expandable-content" style="display: none;">
+                <ul class="project-timeline">
+                  <li><span class="timeline-date">2019‑2020</span> Managed the website, SEO, design, and content writing for Bobogamez.com, an online gaming platform.</li>
+                  <li><span class="timeline-date">2021</span> Designed and managed a WordPress website for selling baking &amp; chocolate tutorials (natliland.ir). Handled SEO, content writing, and site maintenance. (Startup failed due to client’s management.)</li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Education (full‑width) -->
+        <section class="cv-section expandable-section" id="education">
+          <h2 class="section-title">Education</h2>
+          <div class="education-card">
+            <h3>M.Sc. Computer Engineering – Software</h3>
+            <span class="education-date">2022 – 2024</span>
+            <p>University of Basir Abyek, Qazvin, Abyek – GPA: 19.05</p>
+          </div>
+          <div class="expandable-content" style="display: none;">
+            <div class="education-card">
+              <h3>B.Sc. Computer Engineering</h3>
+              <span class="education-date">2018 – 2022</span>
+              <p>University of Basir Abyek – GPA: 17.03</p>
+            </div>
+          </div>
+          <button class="toggle-expand" data-target="education">Show More</button>
+        </section>
+
+        <!-- Certifications & Honors -->
+        <section class="cv-section" id="certifications">
+          <h2 class="section-title">Certifications &amp; Honors</h2>
+          <ul class="cert-list">
+            <li>Advanced Python – Coursera</li>
+            <li>Unreal Engine Fundamentals – Udemy (in progress)</li>
+            <li>English Diploma – Arman Institute (Oct 2012)</li>
+            <li>First Aid Course – Red Crescent Society (May 2024) – 
+              <a href="https://Ims.rcs.ir/certificates?id=0020578814" target="_blank" rel="noopener">View Certificate</a>
+            </li>
+            <li>Driving Licence (2024)</li>
+            <li><strong>🏆 Honor:</strong> Top rank in English Language – Qaemiyeh/Chaharbagh – 
+              <a href="https://mega.nz/file/fsQQAaLS#-xuDPrN-i0xfVQSlD_P04jnO3GshF6BjBJrWtfQ5oSs" target="_blank" rel="noopener">View Document</a>
+            </li>
+          </ul>
+        </section>
+
+        <!-- Languages -->
+        <section class="cv-section" id="languages">
+          <h2 class="section-title">Languages</h2>
+          <div class="languages-list">
+            <span class="language-badge">Persian (Native)</span>
+            <span class="language-badge">Kurdish (Native)</span>
+            <span class="language-badge">English (Fluent – 5‑star)</span>
+            <span class="language-badge">Japanese (Basic)</span>
+          </div>
+        </section>
+
+        <!-- Soft Skills -->
+        <section class="cv-section" id="soft-skills">
+          <h2 class="section-title">Soft Skills &amp; Personal Traits</h2>
+          <div class="soft-skills-grid">
+            <div class="soft-skill">Patient</div>
+            <div class="soft-skill">Compassionate</div>
+            <div class="soft-skill">Agile mindset</div>
+            <div class="soft-skill">Problem‑solver</div>
+            <div class="soft-skill">Team player</div>
+            <div class="soft-skill">Fast learner</div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <footer class="portfolio-footer" id="mainFooter">
+      <a href="cv.html" class="footer-link active" data-section="cv">CV</a>
+      <a href="projects.html" class="footer-link" data-section="projects">Projects</a>
+      <a href="blogs.html" class="footer-link" data-section="blogs">Blogs</a>
+      <a href="socialmedia.html" class="footer-link" data-section="social">Social Media</a>
+    </footer>
+  </div>
+
+  <script src="script.main.js"></script>
+  <script src="script.cv.js"></script>
+  <script src="script.cursor.js"></script>
+</body>
+</html>
